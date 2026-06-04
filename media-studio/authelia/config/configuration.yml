@@ -1,0 +1,57 @@
+---
+theme: dark
+
+jwt_secret: "{{ env "AUTHELIA_JWT_SECRET" }}"
+
+default_redirection_url: https://media.yourstudio.com
+
+server:
+  host: 0.0.0.0
+  port: 9091
+
+log:
+  level: info
+
+totp:
+  issuer: yourstudio.com
+
+authentication_backend:
+  file:
+    path: /config/users_database.yml
+    password:
+      algorithm: argon2id
+      iterations: 1
+      salt_length: 16
+      parallelism: 8
+      memory: 64
+
+access_control:
+  default_policy: deny
+  rules:
+    - domain: admin.yourstudio.com
+      policy: two_factor
+      networks:
+        - 192.168.0.0/16
+
+    - domain: media.yourstudio.com
+      policy: one_factor
+
+session:
+  name: authelia_session
+  secret: "{{ env "AUTHELIA_SESSION_SECRET" }}"
+  expiration: 12h
+  inactivity: 2h
+  domain: yourstudio.com
+
+regulation:
+  max_retries: 5
+  find_time: 2m
+  ban_time: 10m
+
+storage:
+  local:
+    path: /config/db.sqlite3
+
+notifier:
+  filesystem:
+    filename: /config/notification.txt

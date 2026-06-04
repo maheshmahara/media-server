@@ -1,0 +1,52 @@
+version: "3.9"
+
+services:
+  jellyfin:
+    image: jellyfin/jellyfin:10.9.7
+    container_name: jellyfin
+    restart: unless-stopped
+
+    user: "${PUID}:${PGID}"
+
+    environment:
+      - TZ=${TZ}
+      - JELLYFIN_PublishedServerUrl=${JELLYFIN_PUBLISHED_URL}
+
+    volumes:
+      - ${CACHE_ROOT}/jellyfin/config:/config
+      - ${CACHE_ROOT}/jellyfin/transcodes:/config/transcodes
+      - ${CACHE_ROOT}/jellyfin/cache:/cache
+      - ${MEDIA_ROOT}:/media/clients:ro
+
+    devices:
+      - /dev/dri/renderD128:/dev/dri/renderD128
+      - /dev/dri/card0:/dev/dri/card0
+
+    group_add:
+      - "${RENDER_GID}"
+
+    ports:
+      - "127.0.0.1:8096:8096"
+      - "127.0.0.1:8920:8920"
+
+    networks:
+      - media_net
+
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8096/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+
+    deploy:
+      resources:
+        limits:
+          memory: 8G
+        reservations:
+          memory: 2G
+
+networks:
+  media_net:
+    external: true
+    name: media_net

@@ -1,0 +1,63 @@
+version: "3.9"
+
+services:
+
+  nginx-proxy-manager:
+    image: jc21/nginx-proxy-manager:latest
+    container_name: nginx-proxy-manager
+    restart: unless-stopped
+
+    ports:
+      - "80:80"
+      - "443:443"
+      - "127.0.0.1:81:81"
+
+    environment:
+      - TZ=${TZ}
+
+    volumes:
+      - ${DOCKER_CONFIG}/npm/data:/data
+      - ${DOCKER_CONFIG}/npm/letsencrypt:/etc/letsencrypt
+
+    networks:
+      - media_net
+
+    healthcheck:
+      test: ["CMD", "/bin/check-health"]
+      interval: 10s
+      timeout: 3s
+
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    container_name: cloudflared
+    restart: unless-stopped
+
+    command: tunnel --no-autoupdate run --token ${CLOUDFLARE_TUNNEL_TOKEN}
+
+    environment:
+      - TZ=${TZ}
+
+    networks:
+      - media_net
+
+  authelia:
+    image: authelia/authelia:latest
+    container_name: authelia
+    restart: unless-stopped
+
+    volumes:
+      - ${DOCKER_CONFIG}/authelia/config:/config
+
+    environment:
+      - TZ=${TZ}
+
+    ports:
+      - "127.0.0.1:9091:9091"
+
+    networks:
+      - media_net
+
+networks:
+  media_net:
+    external: true
+    name: media_net

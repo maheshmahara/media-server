@@ -1,0 +1,16 @@
+tunnel: YOUR_TUNNEL_ID
+credentials-file: /etc/cloudflared/creds.json
+
+ingress:
+  - hostname: media.yourstudio.com
+    service: http://nginx-proxy-manager:80
+    originRequest:
+      noTLSVerify: false
+      connectTimeout: 30s
+      tcpKeepAlive: 30s
+      keepAliveConnections: 100
+
+  - hostname: admin.yourstudio.com
+    service: http://nginx-proxy-manager:81
+
+  - service: http_status:404

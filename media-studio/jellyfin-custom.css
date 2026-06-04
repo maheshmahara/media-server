@@ -1,0 +1,40 @@
+/* Netflix-style Jellyfin theme — paste in Admin → Dashboard → General → Custom CSS */
+
+.backgroundContainer, .paper-item-backdrop {
+  background: #141414 !important;
+}
+
+.cardBox {
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+#loginPage .padded-left.padded-right h1 {
+  display: none;
+}
+
+#logoImage {
+  display: none;
+}
+
+.headerLogo::before {
+  content: "YOUR STUDIO";   /* ← change to your studio name */
+  font-size: 1.4em;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  color: #e50914;            /* ← change to your brand color */
+}
+
+.homeSectionsContainer .cardContent {
+  border-radius: 4px;
+}
+
+.card:hover .cardBox {
+  transform: scale(1.05);
+  transition: transform 0.2s ease;
+  box-shadow: 0 8px 40px rgba(0,0,0,0.7);
+}
+
+.skinHeader {
+  background: linear-gradient(180deg, rgba(20,20,20,0.9) 0%, transparent 100%);
+}

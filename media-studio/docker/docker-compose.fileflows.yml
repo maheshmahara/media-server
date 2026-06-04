@@ -1,0 +1,47 @@
+version: "3.9"
+
+services:
+  fileflows:
+    image: revenz/fileflows:latest
+    container_name: fileflows
+    restart: unless-stopped
+
+    environment:
+      - TZ=${TZ}
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - FFMPEG_BUILDARGS=-hwaccel vaapi -hwaccel_output_format vaapi -vaapi_device /dev/dri/renderD128
+
+    volumes:
+      - ${CACHE_ROOT}/fileflows/data:/app/Data
+      - ${CACHE_ROOT}/fileflows/logs:/app/Logs
+      - ${TRANSCODE_TMP}:/temp
+      - ${STAGING_ROOT}/incoming:/media/staging:ro
+      - ${MEDIA_ROOT}:/media/clients
+
+    devices:
+      - /dev/dri/renderD128:/dev/dri/renderD128
+      - /dev/dri/card0:/dev/dri/card0
+
+    group_add:
+      - "${RENDER_GID}"
+
+    ports:
+      - "127.0.0.1:5000:5000"
+
+    networks:
+      - media_net
+
+    deploy:
+      resources:
+        limits:
+          memory: 16G
+          cpus: "8"
+        reservations:
+          memory: 4G
+          cpus: "2"
+
+networks:
+  media_net:
+    external: true
+    name: media_net
